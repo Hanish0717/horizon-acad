@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { GraduationCap, Mail, Lock, ArrowRight, Github, Chrome } from "lucide-react";
+import { GraduationCap, Mail, Lock, ArrowRight, Github, Chrome, Check } from "lucide-react";
 import { useState } from "react";
+import { ROLE_LIST, setActiveRole, type RoleId } from "@/lib/roles";
 
 export const Route = createFileRoute("/login")({
   head: () => ({
@@ -15,74 +16,111 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const [role, setRole] = useState("Admin");
+  const [roleId, setRoleId] = useState<RoleId>("super_admin");
+  const active = ROLE_LIST.find(r => r.id === roleId)!;
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setActiveRole(roleId);
+    navigate({ to: "/dashboard" });
+  };
+
   return (
-    <div className="min-h-screen grid md:grid-cols-2 bg-gradient-hero">
-      {/* Left illustration */}
-      <div className="relative hidden md:flex items-center justify-center p-12 overflow-hidden">
+    <div className="min-h-screen grid lg:grid-cols-[1.1fr_1fr] bg-gradient-hero">
+      {/* Left — role selection */}
+      <div className="relative hidden lg:flex flex-col p-10 xl:p-14 overflow-hidden">
         <div className="absolute inset-0 grid-bg opacity-40" />
-        <div className="absolute -top-20 -left-20 size-80 rounded-full bg-gradient-primary opacity-30 blur-3xl animate-float" />
-        <div className="absolute bottom-10 right-10 size-72 rounded-full bg-gradient-cyan opacity-30 blur-3xl animate-float" />
+        <div className="absolute -top-32 -right-20 size-96 rounded-full bg-gradient-primary opacity-25 blur-3xl animate-float" />
+        <div className="absolute -bottom-24 -left-24 size-80 rounded-full bg-gradient-violet opacity-25 blur-3xl animate-float" />
+
+        <Link to="/" className="relative inline-flex items-center gap-2 mb-8 w-fit">
+          <div className="size-10 rounded-xl bg-gradient-primary grid place-items-center text-white">
+            <GraduationCap className="size-5" />
+          </div>
+          <span className="font-bold text-xl">Campusly</span>
+        </Link>
+
         <motion.div
-          initial={{ opacity:0, scale:0.95 }} animate={{ opacity:1, scale:1 }} transition={{ duration:0.6 }}
-          className="relative max-w-md text-center"
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+          className="relative"
         >
-          <Link to="/" className="inline-flex items-center gap-2 mb-8">
-            <div className="size-10 rounded-xl bg-gradient-primary grid place-items-center text-white">
-              <GraduationCap className="size-5" />
-            </div>
-            <span className="font-bold text-xl">Campusly</span>
-          </Link>
-          <h1 className="text-4xl font-bold leading-tight">
-            Welcome back to your <span className="text-gradient">campus OS</span>
+          <h1 className="text-3xl xl:text-4xl font-bold leading-tight">
+            Choose your <span className="text-gradient">role</span> to continue
           </h1>
-          <p className="mt-4 text-muted-foreground">One platform for students, faculty, and parents. Beautifully designed for modern education.</p>
-          <div className="mt-10 glass-card rounded-2xl p-5 text-left">
-            <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-gradient-violet" />
-              <div>
-                <div className="text-sm font-semibold">Today's overview</div>
-                <div className="text-xs text-muted-foreground">12,480 students · 94.6% attendance</div>
-              </div>
-            </div>
-            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-              {[["98%","Health"],["12","Events"],["$1.2M","Collected"]].map(([v,l])=>(
-                <div key={l} className="rounded-lg bg-gradient-soft p-2 border">
-                  <div className="text-base font-bold text-gradient">{v}</div>
-                  <div className="text-[10px] text-muted-foreground">{l}</div>
-                </div>
-              ))}
-            </div>
+          <p className="mt-3 text-sm text-muted-foreground max-w-md">
+            Each role unlocks a tailored dashboard, sidebar and permission set across the campus OS.
+          </p>
+
+          <div className="mt-6 grid grid-cols-2 xl:grid-cols-3 gap-3 max-w-3xl">
+            {ROLE_LIST.map(r => {
+              const selected = r.id === roleId;
+              const Icon = r.icon;
+              return (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => setRoleId(r.id)}
+                  className={`group relative text-left rounded-2xl p-4 border transition-all overflow-hidden
+                    ${selected
+                      ? "border-transparent shadow-soft -translate-y-0.5"
+                      : "border-border bg-white/60 hover:-translate-y-0.5 hover:shadow-soft"}`}
+                >
+                  {selected && (
+                    <div className={`absolute inset-0 bg-gradient-to-br ${r.gradient} opacity-95`} />
+                  )}
+                  <div className="relative">
+                    <div className="flex items-center justify-between">
+                      <div className={`size-9 rounded-xl grid place-items-center ${selected ? "bg-white/15 text-white backdrop-blur" : `bg-gradient-to-br ${r.gradient} text-white`}`}>
+                        <Icon className="size-4" />
+                      </div>
+                      {selected && (
+                        <span className="size-5 rounded-full bg-white/20 grid place-items-center">
+                          <Check className="size-3 text-white" />
+                        </span>
+                      )}
+                    </div>
+                    <div className={`mt-3 text-sm font-semibold ${selected ? "text-white" : ""}`}>{r.name}</div>
+                    <div className={`text-[11px] mt-0.5 ${selected ? "text-white/85" : "text-muted-foreground"}`}>
+                      {r.short}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </motion.div>
       </div>
 
-      {/* Right form */}
+      {/* Right — form */}
       <div className="flex items-center justify-center p-6 md:p-12">
         <motion.div
-          initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.5 }}
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
           className="w-full max-w-md glass-card rounded-3xl p-8 shadow-soft"
         >
-          <div className="md:hidden flex items-center gap-2 mb-6">
+          <div className="lg:hidden flex items-center gap-2 mb-6">
             <div className="size-9 rounded-xl bg-gradient-primary grid place-items-center text-white">
               <GraduationCap className="size-5" />
             </div>
             <span className="font-bold text-lg">Campusly</span>
           </div>
-          <h2 className="text-2xl font-bold">Sign in to your account</h2>
+
+          <div className={`rounded-2xl p-4 bg-gradient-to-br ${active.gradient} text-white shadow-soft`}>
+            <div className="text-[11px] uppercase tracking-wide opacity-80">Signing in as</div>
+            <div className="text-lg font-semibold mt-0.5">{active.name}</div>
+            <div className="text-xs opacity-85 mt-0.5">{active.description}</div>
+          </div>
+
+          <h2 className="text-xl font-bold mt-6">Sign in to your account</h2>
           <p className="text-sm text-muted-foreground mt-1">Enter your credentials to access the dashboard</p>
 
-          <form
-            className="mt-6 space-y-4"
-            onSubmit={(e)=>{ e.preventDefault(); navigate({ to:"/dashboard" }); }}
-          >
-            <div>
+          <form className="mt-5 space-y-4" onSubmit={submit}>
+            <div className="lg:hidden">
               <label className="text-xs font-medium">Role</label>
               <select
-                value={role} onChange={(e)=>setRole(e.target.value)}
+                value={roleId} onChange={(e)=>setRoleId(e.target.value as RoleId)}
                 className="mt-1 w-full rounded-xl border bg-background/60 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               >
-                {["Admin","Faculty","Student","Parent","Super Admin"].map(r=> <option key={r}>{r}</option>)}
+                {ROLE_LIST.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
               </select>
             </div>
             <div>
@@ -107,8 +145,8 @@ function LoginPage() {
               </label>
               <a href="#" className="text-indigo hover:underline">Forgot password?</a>
             </div>
-            <button type="submit" className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-primary text-primary-foreground py-2.5 font-medium glow-primary">
-              Sign in <ArrowRight className="size-4" />
+            <button type="submit" className={`w-full inline-flex items-center justify-center gap-2 rounded-xl py-2.5 font-medium text-white bg-gradient-to-r ${active.gradient} shadow-soft`}>
+              Continue as {active.name} <ArrowRight className="size-4" />
             </button>
           </form>
 
