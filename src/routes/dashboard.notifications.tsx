@@ -40,25 +40,64 @@ function NotificationsPage() {
         ))}
       </div>
 
-      <Card>
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold">All Notifications</h3>
-          <button className="text-xs text-indigo hover:underline">Mark all as read</button>
-        </div>
-        <div className="space-y-2">
-          {notifications.map((n,i)=>(
-            <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border ${n.unread ? "bg-gradient-soft" : ""}`}>
-              <div className="size-9 rounded-lg bg-gradient-primary text-white grid place-items-center"><Bell className="size-4" /></div>
-              <div className="flex-1">
-                <div className="text-sm font-medium">{n.title}</div>
-                <div className="text-xs text-muted-foreground">{n.time}</div>
+      <div className="grid lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold">All Notifications</h3>
+            <button className="text-xs text-indigo hover:underline">Mark all as read</button>
+          </div>
+          <div className="space-y-2">
+            {notifications.map((n,i)=>(
+              <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border ${n.unread ? "bg-gradient-soft" : ""}`}>
+                <div className="size-9 rounded-lg bg-gradient-primary text-white grid place-items-center"><Bell className="size-4" /></div>
+                <div className="flex-1">
+                  <div className="text-sm font-medium">{n.title}</div>
+                  <div className="text-xs text-muted-foreground">{n.time}</div>
+                </div>
+                <Badge tone="info">{n.type}</Badge>
+                {n.unread && <span className="size-2 rounded-full bg-gradient-primary" />}
               </div>
-              <Badge tone="info">{n.type}</Badge>
-              {n.unread && <span className="size-2 rounded-full bg-gradient-primary" />}
+            ))}
+          </div>
+        </Card>
+
+        {/* WhatsApp panel */}
+        <Card className="border-0 relative overflow-hidden bg-gradient-to-br from-emerald-500 to-green-600 text-white p-0">
+          <div className="absolute inset-0 grid-bg opacity-15" />
+          <div className="relative p-5 border-b border-white/15 flex items-center gap-3">
+            <div className="size-10 rounded-xl bg-white/20 grid place-items-center backdrop-blur">
+              <MessageSquare className="size-5" />
             </div>
-          ))}
-        </div>
-      </Card>
+            <div>
+              <div className="font-semibold">WhatsApp Alerts</div>
+              <div className="text-[11px] opacity-85">Auto-sent to parents & students</div>
+            </div>
+            <span className="ml-auto inline-flex items-center gap-1 text-[10px] bg-white/15 px-2 py-1 rounded-full">
+              <Zap className="size-3" /> Live
+            </span>
+          </div>
+          <div className="relative p-5 space-y-3">
+            {[
+              { t: "Attendance alert", m: "Aarav was marked absent on May 24.", at: "2m ago" },
+              { t: "Fee reminder", m: "Term 2 fees ₹48,000 due in 5 days.", at: "1h ago" },
+              { t: "Result published", m: "Mid-term results for CSE-3A released.", at: "3h ago" },
+              { t: "Placement drive", m: "Microsoft drive on May 28, 9 AM.", at: "Yesterday" },
+            ].map((x,i)=>(
+              <div key={i} className="rounded-2xl bg-white/12 backdrop-blur p-3 text-sm relative">
+                <div className="flex items-center justify-between">
+                  <div className="font-semibold text-[13px]">{x.t}</div>
+                  <CheckCheck className="size-3.5 opacity-80" />
+                </div>
+                <div className="text-[12px] opacity-90 mt-0.5">{x.m}</div>
+                <div className="text-[10px] opacity-70 mt-1 text-right">{x.at}</div>
+              </div>
+            ))}
+            <button className="w-full mt-2 inline-flex items-center justify-center gap-2 rounded-xl bg-white text-emerald-700 py-2.5 text-sm font-semibold">
+              <Send className="size-4" /> Broadcast new alert
+            </button>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
