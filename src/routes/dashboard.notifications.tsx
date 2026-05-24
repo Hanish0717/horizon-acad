@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, PageHeader, Badge } from "@/components/dashboard/ui";
 import { notifications } from "@/lib/mock-data";
-import { Bell, AlertTriangle, Info, CheckCircle2 } from "lucide-react";
+import { Bell, AlertTriangle, Info, CheckCircle2, MessageSquare, CheckCheck, Zap, Send } from "lucide-react";
 
 export const Route = createFileRoute("/dashboard/notifications")({ component: NotificationsPage });
 
